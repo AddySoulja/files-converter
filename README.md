@@ -72,7 +72,9 @@ The project structure is set up as follows:
 
 ```
 pdfconverter/
-  |- pdfconverter/                 # React client application
+  |- configs/                # mongoDB and passport.js configurations
+  |- controllers/            # routes controllers
+  |- pdfconverter/           # React client application
   |- models/                 # MongoDB models
   |- routes/                 # Express routes
   |- controllers/            # Request handlers/controllers
