@@ -1,0 +1,47 @@
+main {
+    display: flex;
+    flex-direction: column;
+}
+.formData {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 15px 0;
+}
+
+.form-field {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+}
+
+.form-field input {
+    height: 30px;
+}
+
+.displayContent {
+    display: flex;
+    padding: 50px;
+    gap: 20px;
+}
+.content {
+    padding: 8px;
+    border: 1px solid #000;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+table th {
+    padding: 8px;
+    border: 1px solid #96D4D4;
+
+}
+
+table td {
+    border: 1px solid #96D4D4;
+    text-align: center;
+    padding: 8px;
+    font-size: 18px;
+}

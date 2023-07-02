@@ -3,7 +3,11 @@ import mongoose from "mongoose";
 const pdfSchema = mongoose.Schema(
   {
     id: { type: String, required: true },
-    data: { type: Buffer, required: true },
+    fieldname: { type: String },
+    originalname: { type: String },
+    encoding: { type: String },
+    mimetype: { type: String },
+    buffer: { type: Buffer },
   },
   { collection: "PDF" },
   {

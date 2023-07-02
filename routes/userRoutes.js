@@ -6,21 +6,13 @@ import {
   updateUserProfile,
 } from "../controllers/userController.js";
 import authenticate from "../middleware/authMiddleware.js";
-import { convertFiles } from "../controllers/converterController.js";
 import multer from "multer";
 const router = express.Router();
 
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
+const upload = multer({ storage: multer.memoryStorage() });
 
-router.post("/", registerUser);
-router.post("/auth", authUser);
-router.post(
-  "/converter",
-  authenticate,
-  upload.single("existingFile"),
-  convertFiles
-);
+router.post("/", upload.single("photo"), registerUser);
+router.post("/auth", upload.fields(["email", "password"]), authUser);
 router
   .route("/profile")
   .get(authenticate, getUserProfile)

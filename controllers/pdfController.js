@@ -1,19 +1,19 @@
-import fs from "fs";
-import { PDFDocument, StandardFonts } from "pdf-lib";
+import { PDFDocument } from "pdf-lib";
 import createPDF from "./newPdfPage.js";
 
-const pdfController = async (existingPath, newContent) => {
-  const existingPDFBytes = await fs.readFile(existingPath);
-  const pdfDoc = await PDFDocument.load(existingPDFBytes);
+const pdfController = async (file) => {
+  const { buffer } = file;
 
-  const newContentStream = createPDF(newContent);
-  page.setContents(newContentStream);
+  const pdfDoc = await PDFDocument.load(buffer);
+  console.log("pdf: ", pdfDoc);
 
-  // Save the modified PDF to a buffer
-  const modifiedPDFBytes = await pdfDoc.save();
+  // const newContentStream = createPDF(newContent);
+  // page.setContents(newContentStream);
 
-  // Return the modified PDF buffer
-  return modifiedPDFBytes;
+  const modifiedPdf = await pdfDoc.save();
+  console.log("modded: ", modifiedPdf);
+
+  return modifiedPdf;
 };
 
 export default pdfController;
