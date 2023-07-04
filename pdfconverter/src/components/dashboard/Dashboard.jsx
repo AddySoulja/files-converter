@@ -166,8 +166,7 @@ const Dashboard = () => {
             </div>
           )}
 
-          {pageContent.length > 0 &&
-            (open || (file && <button type="submit">Convert</button>))}
+          {open || (file && <button type="submit">Convert</button>)}
         </form>
         <div className="button-menu">
           {file &&

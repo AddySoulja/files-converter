@@ -1,15 +1,16 @@
 import asyncHandler from "express-async-handler";
-import pdfController from "./pdfController.js";
-import PDF from "../models/PDF.js";
+import { PDFDocument } from "pdf-lib";
+import createPDF from "./createPDF.js";
 
 const convertFiles = asyncHandler(async (req, res) => {
-  const { file } = req;
+  const { buffer } = req.file;
   const { content } = req.body;
-  const modifiedPdf = await pdfController(file, content);
+
+  const pdfDoc = await PDFDocument.load(buffer);
+  await createPDF(pdfDoc, content);
+  const modifiedPdf = await pdfDoc.save();
+
   return res.status(200).json({ ok: true, file: [...modifiedPdf] });
-  // console.log(modifiedPdf);
-  // const pdf = await PDF.create({ id, data: modifiedPdf });
-  // res.status(200).json({ pdf: modifiedPdf });
 });
 
 export { convertFiles };
