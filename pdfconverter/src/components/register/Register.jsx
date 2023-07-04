@@ -158,7 +158,7 @@ const Register = () => {
                 type="submit"
                 variant="filled"
                 sx={{
-                  background: "#222",
+                  background: "#2145de",
                   color: "#FFF",
                   ":hover": {
                     color: "#000",
