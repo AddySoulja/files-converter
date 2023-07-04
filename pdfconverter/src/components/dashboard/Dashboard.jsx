@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useCookies } from "react-cookie";
 import { logOut } from "../../redux/slices/authSlice";
@@ -18,28 +18,9 @@ const Dashboard = () => {
   const handleLogout = () => {
     dispatch(logOut());
   };
-
-  const handleAdd = (e) => {
-    setContent((prev) => {
-      return { ...prev, [e.target.name]: e.target.value };
-    });
-  };
   const handleFile = (e) => {
     setFile(e.target.files[0]);
   };
-
-  const handleAddMore = () => {
-    if (
-      content.name === "" ||
-      content.education === "" ||
-      content.isbnNumber === "" ||
-      content.address === ""
-    )
-      return alert("Please provide author details before submitting.");
-    setPageContent((prev) => [...prev, content]);
-    setContent(contentFormat);
-  };
-
   const handleDownload = (url) => {
     const link = document.createElement("a");
     link.href = url;
@@ -47,13 +28,30 @@ const Dashboard = () => {
     document.body.appendChild(link);
     link.click();
   };
+  const addToList = () => {
+    if (
+      content.name === "" ||
+      content.education === "" ||
+      content.isbnNumber === "" ||
+      content.address === ""
+    )
+      return alert("Please provide required author details before submitting.");
+    setPageContent((prev) => [...prev, content]);
+    setContent(contentFormat);
+  };
+
+  const handleAdd = (e) => {
+    setContent((prev) => {
+      return { ...prev, [e.target.name]: e.target.value };
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       const formData = new FormData();
       formData.append("file", file);
+      console.log(pageContent);
       formData.append("content", JSON.stringify(pageContent));
 
       const res = await fetch("http://localhost:5000/api/converter", {
@@ -73,6 +71,9 @@ const Dashboard = () => {
       alert(error);
     }
   };
+  useEffect(() => {
+    setOpen(false);
+  }, [pageContent]);
 
   return (
     <>
@@ -165,14 +166,15 @@ const Dashboard = () => {
             </div>
           )}
 
-          {file && <button type="submit">Convert</button>}
+          {pageContent.length > 0 &&
+            (open || (file && <button type="submit">Convert</button>))}
         </form>
         <div className="button-menu">
           {file &&
             (open || (
               <button onClick={() => setOpen(true)}>Add Author details</button>
             ))}
-          {open && content && <button onClick={handleAddMore}>Add</button>}
+          {open && content && <button onClick={addToList}>Add</button>}
           {pageContent.length > 0 && (
             <button onClick={() => setPageContent([])}>Clear Contents</button>
           )}
