@@ -1,34 +1,78 @@
-import { PDFDocument, StandardFonts } from "pdf-lib";
+import { PageSizes, rgb } from "pdf-lib";
 
-const createPDF = async (data) => {
-  const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage();
-  const { width, height } = page.getSize();
+const createPDF = async (file, contentInJSON) => {
+  const content = JSON.parse(contentInJSON);
+  const page = file.addPage(PageSizes.A4);
+  const table = {
+    rows: Object.keys(content[0]).length,
+    columns: 2,
+    startX: 50,
+    startY: page.getHeight() - 200,
+    rowHeight: 20,
+    columnWidth: 150,
+    borderWidth: 1,
+  };
 
-  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  content.forEach((obj, objIndex) => {
+    const tableStartY = table.startY - objIndex * table.rows * table.rowHeight;
 
-  let y = height - 50;
-
-  const headers = ["Name", "Education", "ISBN Number", "Address"];
-
-  let x = 50;
-  headers.forEach((header, columnIndex) => {
-    page.drawText(header, { x, y, font });
-    x += 150;
-  });
-
-  y -= 20;
-  data.forEach((row, rowIndex) => {
-    x = 50;
-    Object.values(row).forEach((value, columnIndex) => {
-      page.drawText(value.toString(), { x, y, font });
-      x += 150;
+    page.drawRectangle({
+      x: table.startX,
+      y: tableStartY,
+      width: table.columns * table.columnWidth,
+      height: table.rows * table.rowHeight,
+      borderWidth: table.borderWidth,
+      borderColor: rgb(0, 0, 0),
     });
-    y -= 20;
-  });
 
-  const pdfBytes = await pdfDoc.save();
-  return pdfBytes;
+    const propertyRow = Object.keys(obj);
+    propertyRow.forEach((property, rowIndex) => {
+      const cellX = table.startX;
+      const cellY = tableStartY - rowIndex * table.rowHeight;
+
+      page.drawLine({
+        start: { x: cellX, y: cellY },
+        end: { x: cellX, y: cellY - table.rowHeight },
+        thickness: table.borderWidth,
+        color: rgb(0, 0, 0),
+      });
+
+      page.drawLine({
+        start: { x: cellX + table.columnWidth, y: cellY },
+        end: { x: cellX + table.columnWidth, y: cellY - table.rowHeight },
+        thickness: table.borderWidth,
+        color: rgb(0, 0, 0),
+      });
+
+      if (rowIndex !== 0) {
+        page.drawLine({
+          start: { x: cellX, y: cellY - table.rowHeight },
+          end: {
+            x: cellX + table.columns * table.columnWidth,
+            y: cellY - table.rowHeight,
+          },
+          thickness: table.borderWidth,
+          color: rgb(0, 0, 0),
+        });
+      }
+
+      page.drawText(property, {
+        x: cellX + table.borderWidth,
+        y: cellY - table.borderWidth,
+        size: 12,
+        color: rgb(0, 0, 0),
+      });
+
+      const value = obj[property];
+
+      page.drawText(value.toString(), {
+        x: cellX + table.columnWidth + table.borderWidth,
+        y: cellY - table.borderWidth,
+        size: 12,
+        color: rgb(0, 0, 0),
+      });
+    });
+  });
 };
 
 export default createPDF;

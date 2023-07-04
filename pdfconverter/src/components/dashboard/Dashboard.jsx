@@ -11,6 +11,7 @@ const Dashboard = () => {
   const [pageContent, setPageContent] = useState([]);
   const [content, setContent] = useState(contentFormat);
   const [file, setFile] = useState(null);
+  const [receivedFile, setReceivedFile] = useState(null);
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
 
@@ -28,8 +29,23 @@ const Dashboard = () => {
   };
 
   const handleAddMore = () => {
+    if (
+      content.name === "" ||
+      content.education === "" ||
+      content.isbnNumber === "" ||
+      content.address === ""
+    )
+      return alert("Please provide author details before submitting.");
     setPageContent((prev) => [...prev, content]);
     setContent(contentFormat);
+  };
+
+  const handleDownload = (url) => {
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "mypdf.pdf");
+    document.body.appendChild(link);
+    link.click();
   };
 
   const handleSubmit = async (e) => {
@@ -37,8 +53,9 @@ const Dashboard = () => {
 
     try {
       const formData = new FormData();
-      // formData.append("id", new Date().getTime().toString());
       formData.append("file", file);
+      formData.append("content", JSON.stringify(pageContent));
+
       const res = await fetch("http://localhost:5000/api/converter", {
         method: "POST",
         headers: {
@@ -46,7 +63,12 @@ const Dashboard = () => {
         },
         body: formData,
       });
-      console.log(res);
+      const fileData = await res.json();
+
+      const url = window.URL.createObjectURL(
+        new Blob([new Uint8Array(fileData.file).buffer])
+      );
+      handleDownload(url);
     } catch (error) {
       alert(error);
     }
@@ -98,7 +120,7 @@ const Dashboard = () => {
             accept=".pdf,.doc,.docx"
             onChange={handleFile}
           />
-          {/* {file && open && (
+          {file && open && (
             <div className="formData">
               <div className="form-field">
                 <label htmlFor="name">Name</label>
@@ -141,41 +163,49 @@ const Dashboard = () => {
                 />
               </div>
             </div>
-          )}   <div className="button-menu">
-            {file &&
-              (open || (
-                <button onClick={() => setOpen(true)}>
-                  Add Author details
-                </button>
-              ))}
-            {open && <button onClick={handleAddMore}>Add another</button>}
-          </div> */}
+          )}
+
           {file && <button type="submit">Convert</button>}
         </form>
-
-        {/* <div className="displayContent">
-          {pageContent.map((content) => (
-            <table className="content">
-              <th colSpan={2}>Details of Autor- {content.name}</th>
-              <tr>
-                <td>Name</td>
-                <td>{content.name}</td>
-              </tr>
-              <tr>
-                <td>Education</td>
-                <td>{content.education}</td>
-              </tr>
-              <tr>
-                <td>ISBN Number</td>
-                <td>{content.isbnNumber}</td>
-              </tr>
-              <tr>
-                <td>ADDRESS</td>
-                <td>{content.address}</td>
-              </tr>
+        <div className="button-menu">
+          {file &&
+            (open || (
+              <button onClick={() => setOpen(true)}>Add Author details</button>
+            ))}
+          {open && content && <button onClick={handleAddMore}>Add</button>}
+          {pageContent.length > 0 && (
+            <button onClick={() => setPageContent([])}>Clear Contents</button>
+          )}
+        </div>
+        <div className="displayContent">
+          {pageContent.map((content, idx) => (
+            <table className="content" key={idx}>
+              <thead>
+                <tr>
+                  <th colSpan={2}>Details of Autor- {content.name}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Name</td>
+                  <td>{content.name}</td>
+                </tr>
+                <tr>
+                  <td>Education</td>
+                  <td>{content.education}</td>
+                </tr>
+                <tr>
+                  <td>ISBN Number</td>
+                  <td>{content.isbnNumber}</td>
+                </tr>
+                <tr>
+                  <td>ADDRESS</td>
+                  <td>{content.address}</td>
+                </tr>
+              </tbody>
             </table>
           ))}
-        </div> */}
+        </div>
       </main>
     </>
   );

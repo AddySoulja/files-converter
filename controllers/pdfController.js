@@ -1,19 +1,11 @@
 import { PDFDocument } from "pdf-lib";
 import createPDF from "./newPdfPage.js";
 
-const pdfController = async (file) => {
+const pdfController = async (file, content) => {
   const { buffer } = file;
-
   const pdfDoc = await PDFDocument.load(buffer);
-  console.log("pdf: ", pdfDoc);
-
-  // const newContentStream = createPDF(newContent);
-  // page.setContents(newContentStream);
-
-  const modifiedPdf = await pdfDoc.save();
-  console.log("modded: ", modifiedPdf);
-
-  return modifiedPdf;
+  await createPDF(pdfDoc, content);
+  return await pdfDoc.save();
 };
 
 export default pdfController;
